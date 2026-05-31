@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EsquadriGest — Gestão Inteligente para Esquadrias</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --navy:   #0A1628;
+  --blue:   #0D2B5A;
+  --blue2:  #1A4B8C;
+  --gold:   #C9A84C;
+  --gold2:  #E8C96A;
+  --white:  #FFFFFF;
+  --gray:   #8A9BB0;
+  --light:  #F4F7FB;
+  --dark:   #060E1C;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--dark);
+  color: var(--white);
+  overflow-x: hidden;
+}
+
+/* ── NOISE TEXTURE ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.25rem 4rem;
+  background: rgba(6,14,28,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(201,168,76,0.15);
+}
+
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem; font-weight: 700;
+  color: var(--white);
+  letter-spacing: 2px;
+}
+.nav-logo span { color: var(--gold); }
+
+.nav-links { display: flex; gap: 2.5rem; align-items: center; }
+.nav-links a {
+  color: var(--gray); font-size: 0.85rem; font-weight: 500;
+  text-decoration: none; letter-spacing: 0.5px;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--white); }
+
+.btn-nav {
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: var(--navy); border: none; border-radius: 3px;
+  padding: 0.6rem 1.5rem; font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem; font-weight: 600; letter-spacing: 1px;
+  text-transform: uppercase; cursor: pointer; transition: opacity 0.2s;
+  text-decoration: none;
+}
+.btn-nav:hover { opacity: 0.85; }
+
+/* ── HERO ── */
+.hero {
+  position: relative; min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 8rem 4rem 4rem;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute; inset: 0;
+  background: 
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(13,43,90,0.8) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 80% 60%, rgba(201,168,76,0.08) 0%, transparent 60%),
+    linear-gradient(180deg, var(--dark) 0%, #0A1628 100%);
+}
+
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image: 
+    linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+}
+
+.hero-content {
+  position: relative; z-index: 2;
+  text-align: center; max-width: 860px;
+}
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 20px; padding: 0.4rem 1.1rem;
+  font-size: 0.75rem; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: 2rem;
+  animation: fadeUp 0.6s ease forwards;
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  font-weight: 700; line-height: 1.05;
+  letter-spacing: -1px;
+  animation: fadeUp 0.6s ease 0.1s both;
+}
+
+.hero-title em {
+  font-style: italic;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.hero-sub {
+  margin-top: 1.5rem;
+  font-size: 1.1rem; font-weight: 300; color: var(--gray);
+  line-height: 1.7; max-width: 580px; margin-left: auto; margin-right: auto;
+  animation: fadeUp 0.6s ease 0.2s both;
+}
+
+.hero-cta {
+  margin-top: 2.5rem;
+  display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+  animation: fadeUp 0.6s ease 0.3s both;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: var(--navy); border: none; border-radius: 3px;
+  padding: 0.9rem 2.5rem; font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 8px 32px rgba(201,168,76,0.3);
+  text-decoration: none; display: inline-block;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(201,168,76,0.4); }
+
+.btn-secondary {
+  background: transparent; color: var(--white);
+  border: 1px solid rgba(255,255,255,0.2); border-radius: 3px;
+  padding: 0.9rem 2.5rem; font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem; font-weight: 500; cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  text-decoration: none; display: inline-block;
+}
+.btn-secondary:hover { border-color: var(--gold); background: rgba(201,168,76,0.05); }
+
+.hero-stats {
+  margin-top: 4rem;
+  display: flex; gap: 3rem; justify-content: center;
+  animation: fadeUp 0.6s ease 0.4s both;
+}
+.stat { text-align: center; }
+.stat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.2rem; font-weight: 700; color: var(--gold);
+}
+.stat-label { font-size: 0.75rem; color: var(--gray); letter-spacing: 1px; text-transform: uppercase; margin-top: 0.2rem; }
+
+/* ── SECTION ── */
+section { position: relative; padding: 7rem 4rem; }
+
+.section-label {
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700; line-height: 1.1;
+}
+.section-title em { font-style: italic; color: var(--gold); }
+
+.section-sub {
+  margin-top: 1rem; color: var(--gray);
+  font-size: 1rem; line-height: 1.7;
+  max-width: 520px;
+}
+
+/* ── PROBLEMA ── */
+.problema {
+  background: linear-gradient(180deg, var(--dark) 0%, var(--navy) 100%);
+}
+
+.problema-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 4rem; align-items: center;
+  max-width: 1100px; margin: 0 auto;
+}
+
+.problema-lista { margin-top: 2.5rem; display: flex; flex-direction: column; gap: 1.2rem; }
+
+.problema-item {
+  display: flex; gap: 1rem; align-items: flex-start;
+  padding: 1.25rem 1.5rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 6px;
+  transition: border-color 0.2s;
+}
+.problema-item:hover { border-color: rgba(201,168,76,0.2); }
+
+.problema-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 0.1rem; }
+.problema-text strong { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem; }
+.problema-text p { font-size: 0.82rem; color: var(--gray); line-height: 1.5; }
+
+.solucao-card {
+  background: linear-gradient(135deg, rgba(13,43,90,0.6), rgba(26,75,140,0.3));
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 12px; padding: 2.5rem;
+  position: relative; overflow: hidden;
+}
+.solucao-card::before {
+  content: '';
+  position: absolute; top: -50%; right: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 60%);
+}
+
+.solucao-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: var(--navy); border-radius: 2px;
+  padding: 0.3rem 0.8rem; font-size: 0.7rem;
+  font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.solucao-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem; font-weight: 700; margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.solucao-lista { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem; }
+.solucao-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  font-size: 0.87rem; color: rgba(255,255,255,0.85);
+}
+.solucao-check {
+  width: 18px; height: 18px; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 0.6rem; color: var(--navy); font-weight: 800;
+}
+
+/* ── FEATURES ── */
+.features { background: var(--navy); }
+
+.features-header { text-align: center; max-width: 600px; margin: 0 auto 4rem; }
+
+.features-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem; max-width: 1100px; margin: 0 auto;
+}
+
+.feature-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px; padding: 2rem;
+  transition: border-color 0.2s, transform 0.2s;
+  position: relative; overflow: hidden;
+}
+.feature-card:hover { border-color: rgba(201,168,76,0.3); transform: translateY(-3px); }
+.feature-card::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0; transition: opacity 0.2s;
+}
+.feature-card:hover::after { opacity: 1; }
+
+.feature-icon {
+  width: 48px; height: 48px;
+  background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05));
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; margin-bottom: 1.25rem;
+}
+
+.feature-title { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+.feature-desc { font-size: 0.83rem; color: var(--gray); line-height: 1.6; }
+
+/* ── COMO FUNCIONA ── */
+.como { background: var(--dark); }
+.como-header { text-align: center; max-width: 600px; margin: 0 auto 4rem; }
+
+.steps {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 2rem; max-width: 1100px; margin: 0 auto;
+  position: relative;
+}
+.steps::before {
+  content: '';
+  position: absolute; top: 2rem; left: 15%; right: 15%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+}
+
+.step { text-align: center; }
+.step-num {
+  width: 56px; height: 56px; margin: 0 auto 1.25rem;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem; font-weight: 700; color: var(--navy);
+  position: relative; z-index: 1;
+}
+.step-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; }
+.step-desc { font-size: 0.8rem; color: var(--gray); line-height: 1.6; }
+
+/* ── PRECO ── */
+.preco { background: var(--navy); }
+.preco-header { text-align: center; max-width: 600px; margin: 0 auto 4rem; }
+
+.preco-card {
+  max-width: 440px; margin: 0 auto;
+  background: linear-gradient(135deg, rgba(13,43,90,0.8), rgba(6,14,28,0.9));
+  border: 1px solid rgba(201,168,76,0.35);
+  border-radius: 16px; padding: 3rem;
+  position: relative; overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+}
+.preco-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.preco-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: var(--navy); border-radius: 20px;
+  padding: 0.3rem 1rem; font-size: 0.7rem;
+  font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.preco-valor {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3.5rem; font-weight: 700;
+  color: var(--white); line-height: 1;
+}
+.preco-valor span { font-size: 1.2rem; color: var(--gray); font-family: 'DM Sans', sans-serif; }
+.preco-periodo { font-size: 0.82rem; color: var(--gray); margin-top: 0.3rem; }
+
+.preco-divider {
+  height: 1px; background: rgba(255,255,255,0.08);
+  margin: 1.75rem 0;
+}
+
+.preco-lista { display: flex; flex-direction: column; gap: 0.85rem; }
+.preco-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  font-size: 0.87rem;
+}
+.preco-check {
+  width: 20px; height: 20px; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; color: var(--navy); font-weight: 800;
+}
+
+.btn-assinar {
+  display: block; width: 100%; margin-top: 2rem;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: var(--navy); border: none; border-radius: 4px;
+  padding: 1rem; font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+  box-shadow: 0 8px 24px rgba(201,168,76,0.3);
+  text-decoration: none; text-align: center;
+}
+.btn-assinar:hover { opacity: 0.9; transform: translateY(-2px); }
+
+.preco-nota { text-align: center; margin-top: 1rem; font-size: 0.75rem; color: var(--gray); }
+
+/* ── CTA FINAL ── */
+.cta-final {
+  background: linear-gradient(135deg, var(--blue) 0%, var(--navy) 100%);
+  text-align: center; padding: 7rem 4rem;
+  position: relative; overflow: hidden;
+}
+.cta-final::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 60% at 50% 50%, rgba(201,168,76,0.08) 0%, transparent 70%);
+}
+.cta-final-content { position: relative; z-index: 1; }
+.cta-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700;
+  margin-bottom: 1rem;
+}
+.cta-sub { color: var(--gray); font-size: 1rem; margin-bottom: 2.5rem; }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--dark);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 2rem 4rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.footer-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem; font-weight: 700;
+  color: var(--white);
+}
+.footer-logo span { color: var(--gold); }
+.footer-copy { font-size: 0.75rem; color: var(--gray); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  nav { padding: 1rem 1.5rem; }
+  .nav-links { display: none; }
+  section { padding: 5rem 1.5rem; }
+  .hero { padding: 7rem 1.5rem 4rem; }
+  .hero-stats { gap: 1.5rem; }
+  .problema-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+  .features-grid { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr 1fr; }
+  .steps::before { display: none; }
+  footer { flex-direction: column; gap: 1rem; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Esquadri<span>Gest</span></div>
+  <div class="nav-links">
+    <a href="#problema">O Problema</a>
+    <a href="#features">Funcionalidades</a>
+    <a href="#como">Como Funciona</a>
+    <a href="#preco">Preços</a>
+    <a class="btn-nav" href="#preco">Começar Agora</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge">🏆 &nbsp;O sistema que seu concorrente ainda não tem</div>
+    <h1 class="hero-title">
+      Gestão completa para<br/>
+      sua empresa de <em>esquadrias</em>
+    </h1>
+    <p class="hero-sub">
+      Do pedido ao estoque, do vidro à entrega. 
+      Elimine erros de medida, etiquetas confusas e planilhas perdidas — 
+      tudo em um sistema profissional e fácil de usar.
+    </p>
+    <div class="hero-cta">
+      <a href="#preco" class="btn-primary">Começar por R$59,90/mês</a>
+      <a href="#como" class="btn-secondary">Ver como funciona</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">Digital</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">0</div>
+        <div class="stat-label">Erros de cálculo</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">4</div>
+        <div class="stat-label">Usuários inclusos</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEMA -->
+<section class="problema" id="problema">
+  <div class="problema-grid">
+    <div>
+      <div class="section-label">O Problema</div>
+      <h2 class="section-title">Sua empresa ainda opera assim?</h2>
+      <p class="section-sub">Erros custam caro. Um vidro cortado na medida errada pode desperdiçar centenas de reais — e isso acontece todos os dias.</p>
+      <div class="problema-lista">
+        <div class="problema-item">
+          <div class="problema-icon">📋</div>
+          <div class="problema-text">
+            <strong>Medidas anotadas no papel</strong>
+            <p>Letra ilegível, papel molhado, informação perdida — o cortador corta na medida errada.</p>
+          </div>
+        </div>
+        <div class="problema-item">
+          <div class="problema-icon">🧮</div>
+          <div class="problema-text">
+            <strong>Descontos calculados na calculadora</strong>
+            <p>Cada peça com desconto diferente, calculado na mão, com risco real de erro humano.</p>
+          </div>
+        </div>
+        <div class="problema-item">
+          <div class="problema-icon">📦</div>
+          <div class="problema-text">
+            <strong>Estoque sem controle</strong>
+            <p>Vidros cortados sem identificação. Qual é de qual obra? Quem é o cliente? Ninguém sabe.</p>
+          </div>
+        </div>
+        <div class="problema-item">
+          <div class="problema-icon">💸</div>
+          <div class="problema-text">
+            <strong>Prejuízo evitável todo mês</strong>
+            <p>Um vidro refeito por erro custa R$200 a R$500. O sistema custa R$59,90.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="solucao-card">
+      <div class="solucao-badge">✦ A Solução</div>
+      <div class="solucao-title">EsquadriGest resolve tudo isso em um clique</div>
+      <p style="font-size:0.87rem;color:var(--gray);line-height:1.6;">
+        Um sistema completo desenvolvido especificamente para empresas de esquadrias em alumínio e PVC.
+      </p>
+      <div class="solucao-lista">
+        <div class="solucao-item"><div class="solucao-check">✓</div> Ordem de corte profissional em PDF</div>
+        <div class="solucao-item"><div class="solucao-check">✓</div> Desconto calculado automaticamente</div>
+        <div class="solucao-item"><div class="solucao-check">✓</div> Etiquetas com QR Code único por peça</div>
+        <div class="solucao-item"><div class="solucao-check">✓</div> Controle de estoque em tempo real</div>
+        <div class="solucao-item"><div class="solucao-check">✓</div> Sua logo e nome no PDF</div>
+        <div class="solucao-item"><div class="solucao-check">✓</div> Funciona no celular como app</div>
+        <div class="solucao-item"><div class="solucao-check">✓</div> Até 4 usuários por conta</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="features-header">
+    <div class="section-label">Funcionalidades</div>
+    <h2 class="section-title">Tudo que sua empresa precisa, <em>em um só lugar</em></h2>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">📐</div>
+      <div class="feature-title">Ordem de Corte Profissional</div>
+      <div class="feature-desc">PDF com sua logo, medidas organizadas, espessura, tipo de vidro e posição. O cortador recebe tudo claro e pronto.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🧮</div>
+      <div class="feature-title">Cálculo Automático de Descontos</div>
+      <div class="feature-desc">Digite a medida justa, informe o desconto uma vez — o sistema calcula e já manda a medida final pro cortador. Zero erro.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🏷️</div>
+      <div class="feature-title">Etiquetas com QR Code</div>
+      <div class="feature-desc">6 etiquetas por folha A4, com QR Code único e irrepetível por peça. Cola no vidro e o estoque sabe exatamente o que chegou.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📷</div>
+      <div class="feature-title">Scanner de QR Code</div>
+      <div class="feature-desc">O responsável escaneia pelo celular quando o vidro entra no estoque. Sistema atualiza automaticamente.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📦</div>
+      <div class="feature-title">Controle de Estoque</div>
+      <div class="feature-desc">Busca por cliente, vê todas as peças em estoque, dá baixa individual ou em lote quando o vidro é entregue.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📱</div>
+      <div class="feature-title">App no Celular</div>
+      <div class="feature-desc">Instala direto no Android sem precisar da Play Store. Funciona offline após a primeira visita. Splash screen animada.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🏢</div>
+      <div class="feature-title">Sua Identidade Visual</div>
+      <div class="feature-desc">Sua logo e nome da empresa aparecem no PDF de corte e nas etiquetas. Documento profissional com sua marca.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔒</div>
+      <div class="feature-title">Dados Isolados por Empresa</div>
+      <div class="feature-desc">Cada empresa vê apenas seus próprios dados. Total segurança e privacidade das informações dos seus clientes.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">👥</div>
+      <div class="feature-title">4 Usuários por Conta</div>
+      <div class="feature-desc">Medidor, cortador, vendedor e gerente — cada um com seu acesso, todos usando o mesmo sistema integrado.</div>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA -->
+<section class="como" id="como">
+  <div class="como-header">
+    <div class="section-label">Como Funciona</div>
+    <h2 class="section-title">Do pedido à entrega, <em>tudo controlado</em></h2>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-title">Funcionário mede</div>
+      <div class="step-desc">Digita as medidas no sistema, informa desconto e tipo de vidro. Leva 2 minutos.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-title">Gera os documentos</div>
+      <div class="step-desc">PDF de corte pro cortador + etiquetas com QR Code pra cada peça. Tudo automático.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-title">Cortador corta</div>
+      <div class="step-desc">Recebe o PDF com as medidas exatas já com desconto. Cola a etiqueta no vidro cortado.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-title">Estoque e entrega</div>
+      <div class="step-desc">Escaneia o QR Code na entrada. Na entrega, dá baixa e o vidro sai do sistema.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PREÇO -->
+<section class="preco" id="preco">
+  <div class="preco-header">
+    <div class="section-label">Investimento</div>
+    <h2 class="section-title">Um preço justo para <em>eliminar prejuízos</em></h2>
+    <p class="section-sub" style="margin:1rem auto 0;text-align:center;">Um único vidro refeito por erro já paga o sistema por meses.</p>
+  </div>
+  <div class="preco-card">
+    <div class="preco-badge">✦ Plano Completo</div>
+    <div class="preco-valor">R$59<span>,90</span></div>
+    <div class="preco-periodo">por mês · cobrado mensalmente</div>
+    <div class="preco-divider"></div>
+    <div class="preco-lista">
+      <div class="preco-item"><div class="preco-check">✓</div> Até 4 usuários simultâneos</div>
+      <div class="preco-item"><div class="preco-check">✓</div> PDF de ordem de corte profissional</div>
+      <div class="preco-item"><div class="preco-check">✓</div> Etiquetas com QR Code ilimitadas</div>
+      <div class="preco-item"><div class="preco-check">✓</div> Cálculo automático de descontos</div>
+      <div class="preco-item"><div class="preco-check">✓</div> Controle de estoque em tempo real</div>
+      <div class="preco-item"><div class="preco-check">✓</div> Sua logo e nome nos documentos</div>
+      <div class="preco-item"><div class="preco-check">✓</div> App instalável no celular (PWA)</div>
+      <div class="preco-item"><div class="preco-check">✓</div> Suporte por WhatsApp</div>
+    </div>
+    <a href="#" class="btn-assinar">Começar Agora →</a>
+    <p class="preco-nota">Cancele quando quiser · Sem fidelidade · Sem taxa de setup</p>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-final">
+  <div class="cta-final-content">
+    <h2 class="cta-title">Sua empresa merece<br/>trabalhar com <em style="font-style:italic;color:var(--gold)">precisão</em></h2>
+    <p class="cta-sub">Junte-se às empresas que eliminaram erros de medida e perdas de vidro.</p>
+    <a href="#preco" class="btn-primary">Começar por R$59,90/mês</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Esquadri<span>Gest</span></div>
+  <div class="footer-copy">© 2026 EsquadriGest · Todos os direitos reservados</div>
+</footer>
+
+<script>
+// Scroll animations
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(el => {
+    if(el.isIntersecting) {
+      el.target.style.opacity = '1';
+      el.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.feature-card, .problema-item, .step, .solucao-item').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(20px)';
+  el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>
